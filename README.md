@@ -1,6 +1,8 @@
 # MRC-ARL Nav Team :robot:
 Robot code for the MRC-ARL summer internship at UMD.
 
+![MRC-ARL_Robot](https://github.com/Gidntsquia/MRC-ARL_Nav_Team/assets/32310846/a2710ece-6c81-4e85-815c-19a446631668)
+
 See more details about the program here:
 [Flyer](https://bpb-us-e1.wpmucdn.com/blog.umd.edu/dist/d/961/files/2023/03/ARLSummerResearchExperienceFlyer2023.pdf)
 
