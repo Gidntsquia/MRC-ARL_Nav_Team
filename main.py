@@ -1,5 +1,17 @@
+#!/usr/bin/env python3
+"""Autonomous navigation code for MRC-ARL internship robot project.
+"""
 from nvidia_racecar import NvidiaRacecar
 import time
+
+__author__ = "Jaxon Lee"
+__copyright__ = "Copyright 2023, Maryland Robotics Center"
+__credits__ = ["Addison Hanrattie", "Nicky Sremac-Saari", "Jordan White"]
+__license__ = "GPLv3"
+__version__ = "1.0.0"
+__maintainer__ = "Jaxon Lee"
+__email__ = "jaxondlee@gmail.com"
+__status__ = "Development"
 
 def main():
     print("Hello World!")
