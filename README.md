@@ -10,9 +10,13 @@ git clone https://github.com/Gidntsquia/MRC-ARL_Nav_Team
 python3 main.py
 ```
 
+IMPORTANT: Make sure to turn the motors on before starting! There is a switch on the back
+middle right of the robot. A small red light near the switch will turn red and 
+it will beep when the motors are on.
+
 The robot takes a few seconds to load up, then it will drive
 forward in a spiral shape! Note: the motor controller seems
-to only turn on after the code is run once. Only then will 
+to only fully turn on after the code is run once. Only then will 
 the robot start driving. The motor controller is finnicky.
 
 Team members: Addison Hanrattie, Jaxon Lee, Nicky Sremac-Saari, and Jordan White

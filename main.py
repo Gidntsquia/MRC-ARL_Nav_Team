@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 """Autonomous navigation code for MRC-ARL internship robot project.
+
+Guide to interfacing with robot-
+    car = NvidiaRacecar()  : initializes car, you can control it w/ "car" object 
+    car.throttle = [-1.0, -0.15] U [0.15, 1.0]      : sets motor speed
+    car.steering = [-1.0, 1.0]                      : sets motor steering    
+     
+    actual_throttle = car.throttle_gain * car.throttle
+    actual steering = car.steering_gain * car.steering + car.steering_offset
 """
 from nvidia_racecar import NvidiaRacecar
 import time
@@ -23,7 +31,7 @@ def main():
     print(car.throttle_gain)
     car.throttle = 0.15
     
-    
+
     start_time = time.time()
     
     while (car.steering > 0.0 and time.time() - start_time < 20):
