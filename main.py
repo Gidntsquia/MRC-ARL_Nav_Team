@@ -21,27 +21,64 @@ __maintainer__ = "Jaxon Lee"
 __email__ = "jaxondlee@gmail.com"
 __status__ = "Development"
 
-def main():
-    print("Hello World!")
-    car = NvidiaRacecar()
-    print("Set up!")
+
+def setup():
+    """Force motor encoders to turn on and set steering to initial position.
+    """
+    temp_car = NvidiaRacecar()
+    # Takes a few seconds
+    #temp_car.steering = 1.0
+    temp_car.throttle = 0.2
+    time.sleep(0.5)
+    temp_car.throttle = 0.0
+    time.sleep(0.5)
+    # This should turn the motor encoder on
     
-    car.steering = 1
+    
+def do_spiral_method(car):    
+    """Apply the spiral method for traversing ARL location.
+
+    Args:
+        car (NvidiaRacecar): robot object
+    """
+    car.steering = 1.0
     time.sleep(1)
     print(car.throttle_gain)
     car.throttle = 0.15
     
-
+    
     start_time = time.time()
     
     while (car.steering > 0.0 and time.time() - start_time < 20):
-        car.steering -= 0.005
+        #car.steering -= 0.005
         time.sleep(0.5)
     
+
+def main():
+    """Area for main program. This method is called when calling this file
+    in the terminal.
+    """
+    # Initial setup
+    print("Hello World!")
+    setup()
+    
+    # Main code
+    car = NvidiaRacecar()
+    print("Set up!")
+    # Do this so that car throttle is set to 0 at the end.
+    try:
+        do_spiral_method(car)
+    except KeyboardInterrupt:
+        pass
+    
+    
+    
+    # Closing things
     print("Done")
     car.throttle = 0.0
+    print("Goodbye World... Until next time!")
     
-    print("Goodbye World... :(")
+    time.sleep(1.0)
     
     
     
