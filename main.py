@@ -8,6 +8,12 @@ Guide to interfacing with robot-
      
     actual_throttle = car.throttle_gain * car.throttle
     actual steering = car.steering_gain * car.steering + car.steering_offset
+    
+    
+Known issues:
+    - Steering radius is [-0.15, 0.15]
+    - Robot has high-pitched humming noise when it drives
+    - Sometimes robot stops and can't drive itself forwarad unless pushed
 """
 from nvidia_racecar import NvidiaRacecar
 import time
