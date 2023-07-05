@@ -13,7 +13,7 @@ Guide to interfacing with robot-
 Known issues:
     - Steering radius is [-0.15, 0.15]
     - Robot has high-pitched humming noise when it drives
-    - Sometimes robot stops and can't drive itself forwarad unless pushed
+    - More suspension on back side than front 
 """
 from nvidia_racecar import NvidiaRacecar
 import time
