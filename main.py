@@ -17,6 +17,7 @@ Known issues:
 """
 from nvidia_racecar import NvidiaRacecar
 import time
+import threading
 
 __author__ = "Jaxon Lee"
 __copyright__ = "Copyright 2023, Maryland Robotics Center"
@@ -41,7 +42,7 @@ def setup(car : NvidiaRacecar):
     return car
     
     
-def do_spiral_method(car : NvidiaRacecar):    
+def do_spiral_method(car : NvidiaRacecar, event : threading.Event):    
     """Apply the spiral method for traversing ARL location.
 
     Args:
@@ -49,9 +50,9 @@ def do_spiral_method(car : NvidiaRacecar):
     """
     car.steering = -0.15
     time.sleep(1)
-    print(car.throttle_gain)
-    car.throttle = 0.175
+    # car.throttle = 0.175
     while (True):
+        event.wait()
         pass
     
     start_time = time.time()
@@ -64,6 +65,15 @@ def do_spiral_method(car : NvidiaRacecar):
         print("Timeout reached.")
     
 
+def sensing_thread(event : threading.Event):
+    print("Hello")
+    while True:
+        time.sleep(3)
+        event.clear()
+        print("STOP Main thread prints")
+        time.sleep(5)
+        event.set()
+
 def main():
     """Area for main program. This method is called when calling this file
     in the terminal.
@@ -74,11 +84,17 @@ def main():
     setup(car)
     print("Set up!")
     
+    event = threading.Event()
+    x = threading.Thread(target = sensing_thread, args = (event,), daemon = True)
+    x.start()
+
+    
+    event.set()
     
     # Main code
     ## Do this so that car throttle is set to 0 at the end.
     try:
-        do_spiral_method(car)
+        do_spiral_method(car, event)
     except KeyboardInterrupt:
         pass
     
