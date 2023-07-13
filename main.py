@@ -18,7 +18,7 @@ Known issues:
 from nvidia_racecar import NvidiaRacecar
 import time
 import threading
-# from sensing import sensing_thread
+from sensing import sensing_thread
 
 __author__ = "Jaxon Lee"
 __copyright__ = "Copyright 2023, Maryland Robotics Center"
@@ -52,9 +52,9 @@ def do_spiral_method(car : NvidiaRacecar, event : threading.Event):
     car.steering = -0.15
     time.sleep(1)
     # Minimum 0.175
-    car.throttle = 0.16
+    # car.throttle = 0.16
     while (True):
-        #event.wait()
+        event.wait()
         pass
     
     start_time = time.time()
@@ -81,11 +81,11 @@ def main():
     
     # This thread manages constantly checking for ArUco markers and stopping 
     # the robot spiral when one is detected.
-    # x = threading.Thread(target = sensing_thread, args = (event,), daemon = True)
-    # x.start()
+    x = threading.Thread(target = sensing_thread, args = (car, event,), daemon = True)
+    x.start()
 
     
-    # event.set()
+    event.set()
     
     # Main code
     ## Do this so that car throttle is set to 0 at the end.
