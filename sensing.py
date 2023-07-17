@@ -41,6 +41,9 @@ def sensing_thread(car : NvidiaRacecar, event : threading.Event):
             Run event.set() continues the thread again
     """
     print("Hello")
+    
+    spotted_ids = set()
+    
     while True:
         frames = pipeline.wait_for_frames() # REVIEW: check this
         frame = frames[0]
@@ -55,10 +58,14 @@ def sensing_thread(car : NvidiaRacecar, event : threading.Event):
             print(ids)
             event.clear()
             print("Stop the main thread")
-            car.steering = 0.33
-            time.sleep(0.5)
-            car.steering = -0.33
-            time.sleep(0.5)
+            for id in ids:
+                if id not in spotted_ids:
+                    print("Spotted # ", id)
+                    car.steering = 0.33
+                    time.sleep(0.5)
+                    car.steering = -0.33
+                    time.sleep(0.5)
+                    spotted_ids.add(id)
             print("Release!")
             event.set()
 
