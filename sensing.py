@@ -32,17 +32,20 @@ parameters = cv2.aruco.DetectorParameters_create()
 # parameters.aprilTagMinClusterPixels = 1
 # parameters.aprilTagCriticalRad = 0
 
+spotted_ids = set()
+
+def clear_spotted():
+    spotted_ids = set()
+
 def sensing_thread(car : NvidiaRacecar, event : threading.Event):
     """Thread for detecting ArUco markers and acting on that information.
 
     Args:
         event (threading.Event): Event that stops the spiraling code. 
             Run event.clear() to stop the main thread
-            Run event.set() continues the thread again
+            Run event.set() to continue the thread again
     """
     print("Hello")
-    
-    spotted_ids = set()
     
     while True:
         frames = pipeline.wait_for_frames() # REVIEW: check this
@@ -52,20 +55,27 @@ def sensing_thread(car : NvidiaRacecar, event : threading.Event):
         
         accepted, ids, rejected = cv2.aruco.detectMarkers(color_image, aruco_dict, parameters=parameters)
         print("Detecting")
-        if ids != None and len(ids) > 0:
+        if ids is not None and len(ids) > 0:
             # TODO ignore repeat ArUco ids
             # Range: ~12 m
             print(ids)
-            event.clear()
-            print("Stop the main thread")
-            for id in ids:
-                if id not in spotted_ids:
-                    print("Spotted # ", id)
-                    car.steering = 0.33
-                    time.sleep(0.5)
-                    car.steering = -0.33
-                    time.sleep(0.5)
-                    spotted_ids.add(id)
+            try:
+                for id in ids:
+                    if id[0] not in spotted_ids:
+                        event.clear()
+                        print("Stop the main thread")
+                        
+                        print("Spotted # ", id)
+                        car.steering = 0.33
+                        time.sleep(0.5)
+                        car.steering = -0.33
+                        time.sleep(0.5)
+                        spotted_ids.add(id[0])
+                        
+                        if len(ids) == 3:
+                            clear_spotted()
+            except Exception as e:
+                print("Failed:", e)
             print("Release!")
             event.set()
 

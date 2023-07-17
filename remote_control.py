@@ -4,7 +4,7 @@
 from nvidia_racecar import NvidiaRacecar
 import time
 from RemoteController import RemoteController
-from main import setup
+# from main import setup
 
 
 
@@ -20,7 +20,8 @@ __status__ = "Development"
 def main():
     print("Hi!")
     car = NvidiaRacecar()
-    setup(car)
+    # setup(car)
+    car.steering_offset = -0.2
     car.throttle_gain = -0.2
     controller = RemoteController() 
     controller.init()

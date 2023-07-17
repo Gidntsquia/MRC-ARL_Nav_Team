@@ -14,6 +14,16 @@ Known issues:
     - Steering radius is [-0.15, 0.15]
     - Robot has high-pitched humming noise when it drives
     - More suspension on back side than front 
+    
+    
+Note:
+If you get issue relating to gpiochip file not existing, run these commands:
+`
+sudo usermod -aG gpio $USER
+sudo chown root.gpio /dev/gpiochip0
+sudo chmod 660 /dev/gpiochip0
+`
+And it should work.
 """
 from nvidia_racecar import NvidiaRacecar
 import time
@@ -49,7 +59,7 @@ def do_spiral_method(car : NvidiaRacecar, event : threading.Event):
     Args:
         car (NvidiaRacecar): robot object
     """
-    car.steering = -0.15
+    # car.steering = -0.15
     time.sleep(1)
     # Minimum 0.175
     # car.throttle = 0.16
