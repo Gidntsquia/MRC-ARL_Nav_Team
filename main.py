@@ -48,11 +48,11 @@ def setup(car : NvidiaRacecar):
     #time.sleep(0.5)
     car.throttle = 0.0
     time.sleep(0.5)
-    
+
     # This should turn the motor encoder on
     return car
-    
-    
+
+
 def do_spiral_method(car : NvidiaRacecar, event : threading.Event):    
     """Apply the spiral method for traversing ARL location.
 
@@ -66,13 +66,13 @@ def do_spiral_method(car : NvidiaRacecar, event : threading.Event):
     while (True):
         event.wait()
         pass
-    
+
     start_time = time.time()
-    
+
     while (car.steering < 0.0 and time.time() - start_time < 30):
         car.steering += 0.005
         time.sleep(0.5)
-    
+
     if (time.time() - start_time >= 30):
         print("Timeout reached.")
 
@@ -85,36 +85,36 @@ def main():
     car = NvidiaRacecar()  # Takes a few seconds
     setup(car)
     print("Set up!")
-    
+
     # This event controls whether the motor does its spiral
     event = threading.Event()
-    
+
     # This thread manages constantly checking for ArUco markers and stopping 
     # the robot spiral when one is detected.
     x = threading.Thread(target = sensing_thread, args = (car, event,), daemon = True)
     x.start()
 
-    
+
     event.set()
-    
+
     # Main code
     ## Do this so that car throttle is set to 0 at the end.
     try:
         do_spiral_method(car, event)
     except KeyboardInterrupt:
         pass
-    
-    
-    
+
+
+
     # Closing things
     print("Done")
     car.steering = 0.0001
     car.throttle = 0.0
     print("Goodbye World... Until next time!")
-    
+
     time.sleep(1.0)
-    
-    
-    
+
+
+
 if __name__ == '__main__':
     main()

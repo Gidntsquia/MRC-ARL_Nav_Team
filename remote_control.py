@@ -23,30 +23,26 @@ def main():
     # setup(car)
     car.steering_offset = -0.2
     car.throttle_gain = -0.2
-    controller = RemoteController() 
+    controller = RemoteController()
     controller.init()
     print("Set up!")
     time.sleep(1)
-    
+
     try:
         while True:
             controller_inputs = controller.listen()
             car.throttle_gain = controller.my_throttle_gain
-            throttle_input = controller_inputs[1][1] 
+            throttle_input = controller_inputs[1][1]
             car.throttle = throttle_input
             car.steering = controller_inputs[1][0]
-            
-            
-            
     except KeyboardInterrupt:
         pass
-    
-    
+
     # Closing things
     print("Done")
     car.steering = 0.0001
     car.throttle = 0.0
     print("Goodbye World... Until next time!")
-    
+
 if __name__ == '__main__':
     main()

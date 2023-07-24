@@ -64,14 +64,14 @@ def sensing_thread(car : NvidiaRacecar, event : threading.Event):
                     if id[0] not in spotted_ids:
                         event.clear()
                         print("Stop the main thread")
-                        
+
                         print("Spotted # ", id)
                         car.steering = 0.33
                         time.sleep(0.5)
                         car.steering = -0.33
                         time.sleep(0.5)
                         spotted_ids.add(id[0])
-                        
+
                         if len(ids) == 3:
                             clear_spotted()
             except Exception as e:

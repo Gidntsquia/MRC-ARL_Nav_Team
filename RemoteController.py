@@ -29,15 +29,15 @@ class RemoteController():
         self.axis_data = False
         self.button_data = False
         self.hat_data = False       
-        
+
         self.my_throttle_gain = -0.2
 
         print('Pygame init complete')
-        
+
 
     def listen(self):
         """Listen for events to happen"""
-        
+
         if not self.axis_data:
             self.axis_data = {0:0.0,1:0.0,2:0.0,3:-1.0,4:-1.0,5:0.0} #default
 
@@ -56,11 +56,11 @@ class RemoteController():
                 self.axis_data[event.axis] = round(event.value,2)
             elif event.type == pygame.JOYBUTTONDOWN:
                 self.button_data[event.button] = True
-                if (event.button == 4):
+                if event.button == 4:
                     # Increase speed
                     self.my_throttle_gain -= 0.05
                     print("Up!", self.my_throttle_gain)
-                elif (event.button == 0):
+                elif event.button == 0:
                     # Decrease speed
                     self.my_throttle_gain += 0.05
                     print("Down!", self.my_throttle_gain)
@@ -68,18 +68,16 @@ class RemoteController():
                 self.button_data[event.button] = False
             elif event.type == pygame.JOYHATMOTION:
                 self.hat_data[event.hat] = event.value
-                
+
         return self.button_data, self.axis_data, self.hat_data
 
             # Insert your code on what you would like to happen for each event here!
             # In the current setup, I have the state simply printing out to the screen.
-            
+
             #os.system('clear')
             #pprint.pprint(self.button_data)
             #pprint.pprint(self.axis_data)
             #pprint.pprint(self.hat_data)
-
-    
 
 
 if __name__ == "__main__":
