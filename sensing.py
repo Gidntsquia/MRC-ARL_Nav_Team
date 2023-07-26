@@ -27,12 +27,13 @@ config = rs.config()
 config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
 profile = pipeline.start(config)
 
-aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_50)
-parameters = cv2.aruco.DetectorParameters_create()
+aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_50)
+parameters = cv2.aruco.DetectorParameters()
+refine_param = cv2.aruco.RefineParameters()
 # parameters.aprilTagMinClusterPixels = 1
 # parameters.aprilTagCriticalRad = 0
 
-spotted_ids = set()
+detector = cv2.aruco.ArucoDetector(aruco_dict, parameters, refine_param)
 
 def clear_spotted():
     spotted_ids = set()
@@ -53,7 +54,7 @@ def sensing_thread(car : NvidiaRacecar, event : threading.Event):
         color_image = np.asanyarray(frame.get_data())
         color_image = color_image[...,::-1].copy()
         
-        accepted, ids, rejected = cv2.aruco.detectMarkers(color_image, aruco_dict, parameters=parameters)
+        accepted, ids, rejected = detector.detectMarkers(color_image, aruco_dict, parameters=parameters)
         print("Detecting")
         if ids is not None and len(ids) > 0:
             # TODO ignore repeat ArUco ids

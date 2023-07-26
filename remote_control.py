@@ -36,7 +36,7 @@ def main():
             car.throttle = throttle_input
             car.steering = controller_inputs[1][0]
     except KeyboardInterrupt:
-        pass
+        print("Interrupted")
 
     # Closing things
     print("Done")
