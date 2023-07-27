@@ -17,12 +17,7 @@ __maintainer__ = "Jaxon Lee"
 __email__ = "jaxondlee@gmail.com"
 __status__ = "Development"
 
-def main():
-    print("Hi!")
-    car = NvidiaRacecar()
-    # setup(car)
-    car.steering_offset = -0.2
-    car.throttle_gain = -0.2
+def main(car: NvidiaRacecar):
     controller = RemoteController()
     controller.init()
     print("Set up!")
@@ -45,4 +40,10 @@ def main():
     print("Goodbye World... Until next time!")
 
 if __name__ == '__main__':
+    print("Hi!")
+    car = NvidiaRacecar()
+    # setup(car)
+    car.steering_offset = -0.2
+    car.throttle_gain = -0.2
+    
     main()

@@ -21,6 +21,8 @@ import numpy as np
 import cv2
 import pyrealsense2 as rs
 
+WAIT_TIME = 0.5 # MARK: Tweak to increase delay on detections
+
 pipeline = rs.pipeline()
 config = rs.config()
 
@@ -34,6 +36,8 @@ refine_param = cv2.aruco.RefineParameters()
 # parameters.aprilTagCriticalRad = 0
 
 detector = cv2.aruco.ArucoDetector(aruco_dict, parameters, refine_param)
+
+spotted_ids = set()
 
 def clear_spotted():
     spotted_ids = set()
@@ -54,7 +58,7 @@ def sensing_thread(car : NvidiaRacecar, event : threading.Event):
         color_image = np.asanyarray(frame.get_data())
         color_image = color_image[...,::-1].copy()
         
-        accepted, ids, rejected = detector.detectMarkers(color_image, aruco_dict, parameters=parameters)
+        accepted, ids, rejected = detector.detectMarkers(color_image)
         print("Detecting")
         if ids is not None and len(ids) > 0:
             # TODO ignore repeat ArUco ids
@@ -67,18 +71,20 @@ def sensing_thread(car : NvidiaRacecar, event : threading.Event):
                         print("Stop the main thread")
 
                         print("Spotted # ", id)
-                        car.steering = 0.33
-                        time.sleep(0.5)
-                        car.steering = -0.33
-                        time.sleep(0.5)
+                        car.steering = 0.5
+                        car.throttle = 0.0
+                        time.sleep(WAIT_TIME)
+                        car.steering = -0.5
+                        time.sleep(WAIT_TIME)
                         spotted_ids.add(id[0])
 
                         if len(ids) == 3:
                             clear_spotted()
             except Exception as e:
                 print("Failed:", e)
-            print("Release!")
-            event.set()
+            finally:
+                print("Release!")
+                event.set()
 
 
 if __name__ == '__main__':
