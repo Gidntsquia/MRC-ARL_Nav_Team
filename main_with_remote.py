@@ -46,13 +46,16 @@ def setup(car : NvidiaRacecar):
     """Force motor encoders to turn on and set steering to initial position.
     """
     car.steering_offset = -0.2
-    #car.throttle = 0.2
-    #time.sleep(0.5)
     car.throttle = 0.0
     time.sleep(0.5)
 
     # This should turn the motor encoder on
     return car
+
+
+
+def clamp(n, minn, maxn):
+    return max(min(maxn, n), minn)
 
 def do_remote_control(car: NvidiaRacecar, event: threading.Event):
     car.steering_offset = -0.2
@@ -70,7 +73,9 @@ def do_remote_control(car: NvidiaRacecar, event: threading.Event):
             car.throttle_gain = controller.my_throttle_gain
             throttle_input = controller_inputs[1][1]
             car.throttle = throttle_input
-            car.steering = controller_inputs[1][0]
+            steering_input : float = controller_inputs[1][0]
+            steering_input = clamp(steering_input, -0.8, 1.0)
+            car.steering = steering_input
     except KeyboardInterrupt:
         print("interrupted")
 
