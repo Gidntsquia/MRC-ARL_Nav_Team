@@ -59,7 +59,6 @@ def sensing_thread(car : NvidiaRacecar, event : threading.Event):
         color_image = color_image[...,::-1].copy()
         
         accepted, ids, rejected = detector.detectMarkers(color_image)
-        print("Detecting")
         if ids is not None and len(ids) > 0:
             # TODO ignore repeat ArUco ids
             # Range: ~12 m
@@ -71,11 +70,12 @@ def sensing_thread(car : NvidiaRacecar, event : threading.Event):
                         print("Stop the main thread")
 
                         print("Spotted # ", id)
-                        car.steering = 0.5
                         car.throttle = 0.0
-                        time.sleep(WAIT_TIME)
-                        car.steering = -0.5
-                        time.sleep(WAIT_TIME)
+                        for _ in range(1): # twist n times
+                            car.steering = 0.5
+                            time.sleep(WAIT_TIME)
+                            car.steering = -0.5
+                            time.sleep(WAIT_TIME)
                         spotted_ids.add(id[0])
 
                         if len(ids) == 3:

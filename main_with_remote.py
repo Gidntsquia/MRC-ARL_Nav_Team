@@ -25,8 +25,10 @@ sudo chmod 660 /dev/gpiochip0
 `
 And it should work.
 """
+import time 
+time.sleep(10)
+
 from nvidia_racecar import NvidiaRacecar
-import time
 import threading
 
 from sensing import sensing_thread
@@ -74,7 +76,9 @@ def do_remote_control(car: NvidiaRacecar, event: threading.Event):
             throttle_input = controller_inputs[1][1]
             car.throttle = throttle_input
             steering_input : float = controller_inputs[1][0]
+            temp = steering_input
             steering_input = clamp(steering_input, -0.8, 1.0)
+            print(temp, "->", steering_input)
             car.steering = steering_input
     except KeyboardInterrupt:
         print("interrupted")

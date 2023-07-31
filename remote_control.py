@@ -29,7 +29,10 @@ def main(car: NvidiaRacecar):
             car.throttle_gain = controller.my_throttle_gain
             throttle_input = controller_inputs[1][1]
             car.throttle = throttle_input
-            car.steering = controller_inputs[1][0]
+            steering_input = controller_inputs[1][0]
+            if (steering_input < -0.5):
+                steering_input = -0.5
+            car.steering = steering_input
     except KeyboardInterrupt:
         print("Interrupted")
 
@@ -46,4 +49,4 @@ if __name__ == '__main__':
     car.steering_offset = -0.2
     car.throttle_gain = -0.2
     
-    main()
+    main(car)
