@@ -28,8 +28,10 @@ KNOWN_MARKERS = set(TWISTS_PER_ID.keys())
 pipeline = rs.pipeline()
 config = rs.config()
 
-config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
-# profile = pipeline.start(config)
+# MARK: Disable depth steam if needed
+config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
+config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30) # TODO: switch to rgb
+
 print("camera started")
 
 aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_50)
@@ -44,9 +46,12 @@ def call_camera(car: NvidiaRacecar):
     profile = pipeline.start(config)
 
     frames = pipeline.wait_for_frames() # REVIEW: check this
-    frame = frames[0]
+    frame = frames[1]
     color_image = np.asanyarray(frame.get_data())
     color_image = color_image[...,::-1].copy()
+    
+    depth_frame = frames[0].as_depth_frame()
+    print("Depth in middle of screen is ", depth_frame.get_distance(depth_frame.width // 2, depth_frame.height // 2))
 
     accepted, ids, rejected = detector.detectMarkers(color_image)
     if ids is not None and len(ids) > 0:
@@ -67,6 +72,8 @@ def call_camera(car: NvidiaRacecar):
                         time.sleep(WAIT_TIME / 2)
         except Exception as e:
             print("Failed:", e)
+    elif depth_frame.get_distance(depth_frame.width // 2, depth_frame.height // 2) < 1.1: # if less than 1.1 meters to wall panic
+        print("Warning: Close to Wall")
 
     pipeline.stop()
     print("stopped")
