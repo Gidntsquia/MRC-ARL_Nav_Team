@@ -22,12 +22,15 @@ import cv2
 import pyrealsense2 as rs
 
 WAIT_TIME = 0.5 # MARK: Tweak to increase delay on detections
+TWISTS_PER_ID = {0:1, 1:2, 15:3}
+KNOWN_MARKERS = set(TWISTS_PER_ID.keys())
 
 pipeline = rs.pipeline()
 config = rs.config()
 
 config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
-profile = pipeline.start(config)
+# profile = pipeline.start(config)
+print("camera started")
 
 aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_50)
 parameters = cv2.aruco.DetectorParameters()
@@ -37,55 +40,37 @@ refine_param = cv2.aruco.RefineParameters()
 
 detector = cv2.aruco.ArucoDetector(aruco_dict, parameters, refine_param)
 
-spotted_ids = set()
+def call_camera(car: NvidiaRacecar):
+    profile = pipeline.start(config)
 
-def clear_spotted():
-    spotted_ids = set()
+    frames = pipeline.wait_for_frames() # REVIEW: check this
+    frame = frames[0]
+    color_image = np.asanyarray(frame.get_data())
+    color_image = color_image[...,::-1].copy()
 
-def sensing_thread(car : NvidiaRacecar, event : threading.Event):
-    """Thread for detecting ArUco markers and acting on that information.
+    accepted, ids, rejected = detector.detectMarkers(color_image)
+    if ids is not None and len(ids) > 0:
+        # TODO ignore repeat ArUco ids
+        # Range: ~12 m
+        print(ids)
+        try:
+            for id in ids:
+                if id[0] in KNOWN_MARKERS:
+                    print("Stop the main thread")
 
-    Args:
-        event (threading.Event): Event that stops the spiraling code. 
-            Run event.clear() to stop the main thread
-            Run event.set() to continue the thread again
-    """
-    print("Hello")
-    
-    while True:
-        frames = pipeline.wait_for_frames() # REVIEW: check this
-        frame = frames[0]
-        color_image = np.asanyarray(frame.get_data())
-        color_image = color_image[...,::-1].copy()
-        
-        accepted, ids, rejected = detector.detectMarkers(color_image)
-        if ids is not None and len(ids) > 0:
-            # TODO ignore repeat ArUco ids
-            # Range: ~12 m
-            print(ids)
-            try:
-                for id in ids:
-                    if id[0] not in spotted_ids:
-                        event.clear()
-                        print("Stop the main thread")
+                    print("Spotted # ", id)
+                    car.throttle = 0.0
+                    for _ in range(TWISTS_PER_ID[id[0]]): # twist n times
+                        car.steering = 0.5
+                        time.sleep(WAIT_TIME)
+                        car.steering = -0.5
+                        time.sleep(WAIT_TIME / 2)
+        except Exception as e:
+            print("Failed:", e)
 
-                        print("Spotted # ", id)
-                        car.throttle = 0.0
-                        for _ in range(1): # twist n times
-                            car.steering = 0.5
-                            time.sleep(WAIT_TIME)
-                            car.steering = -0.5
-                            time.sleep(WAIT_TIME)
-                        spotted_ids.add(id[0])
-
-                        if len(ids) == 3:
-                            clear_spotted()
-            except Exception as e:
-                print("Failed:", e)
-            finally:
-                print("Release!")
-                event.set()
+    pipeline.stop()
+    print("stopped")
 
 
 if __name__ == '__main__':
-    print("hello world")
+    print("hello world i am camera")

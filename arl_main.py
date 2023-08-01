@@ -26,12 +26,9 @@ sudo chmod 660 /dev/gpiochip0
 And it should work.
 """
 import time 
-time.sleep(10)
-
 from nvidia_racecar import NvidiaRacecar
-import threading
 
-from sensing import sensing_thread
+from sensing import call_camera
 from RemoteController import RemoteController
 
 __author__ = "Jaxon Lee"
@@ -59,7 +56,7 @@ def setup(car : NvidiaRacecar):
 def clamp(n, minn, maxn):
     return max(min(maxn, n), minn)
 
-def do_remote_control(car: NvidiaRacecar, event: threading.Event):
+def do_remote_control(car: NvidiaRacecar):
     car.steering_offset = -0.2
     car.throttle_gain = -0.2
     controller = RemoteController()
@@ -69,42 +66,22 @@ def do_remote_control(car: NvidiaRacecar, event: threading.Event):
 
     try:
         while True:
-            event.wait() # NOTE: will continue immediately if the event is set if not wait while sensing does its thing
-            
             controller_inputs = controller.listen()
             car.throttle_gain = controller.my_throttle_gain
             throttle_input = controller_inputs[1][1]
             car.throttle = throttle_input
             steering_input : float = controller_inputs[1][0]
-            temp = steering_input
+            # temp = steering_input
             steering_input = clamp(steering_input, -0.8, 1.0)
-            print(temp, "->", steering_input)
+            # print(temp, "->", steering_input)
             car.steering = steering_input
+
+            if controller_inputs[0][3]:
+                call_camera(car)
+
     except KeyboardInterrupt:
         print("interrupted")
 
-def do_spiral_method(car : NvidiaRacecar, event : threading.Event):    
-    """Apply the spiral method for traversing ARL location.
-
-    Args:
-        car (NvidiaRacecar): robot object
-    """
-    # car.steering = -0.15
-    time.sleep(1)
-    # Minimum 0.175
-    # car.throttle = 0.16
-    while (True):
-        event.wait()
-        pass
-
-    start_time = time.time()
-
-    while (car.steering < 0.0 and time.time() - start_time < 30):
-        car.steering += 0.005
-        time.sleep(0.5)
-
-    if (time.time() - start_time >= 30):
-        print("Timeout reached.")
 
 def main():
     """Area for main program. This method is called when calling this file
@@ -116,21 +93,11 @@ def main():
     setup(car)
     print("Set up!")
 
-    # This event controls whether the motor does its spiral
-    event = threading.Event()
-
-    # This thread manages constantly checking for ArUco markers and stopping 
-    # the robot spiral when one is detected.
-    x = threading.Thread(target = sensing_thread, args = (car, event,), daemon = True)
-    x.start()
-
-    event.set()
-
     # Main code
     ## Do this so that car throttle is set to 0 at the end.
     try:
-        # do_spiral_method(car, event)
-        do_remote_control(car, event)
+        # do_spiral_method(car)
+        do_remote_control(car)
     except KeyboardInterrupt:
         pass
 

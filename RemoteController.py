@@ -43,7 +43,7 @@ class RemoteController():
 
         if not self.button_data:
             self.button_data = {}
-            for i in range(self.controller.get_numbuttons()):
+            for i in range(self.controller.get_numbuttons()): # TODO: make more efficient
                 self.button_data[i] = False
 
         if not self.hat_data:
@@ -56,6 +56,7 @@ class RemoteController():
                 self.axis_data[event.axis] = round(event.value,2)
             elif event.type == pygame.JOYBUTTONDOWN:
                 self.button_data[event.button] = True
+                print(event.button)
                 if event.button == 4:
                     # Increase speed
                     self.my_throttle_gain -= 0.05
