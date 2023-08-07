@@ -42,41 +42,54 @@ refine_param = cv2.aruco.RefineParameters()
 
 detector = cv2.aruco.ArucoDetector(aruco_dict, parameters, refine_param)
 
-def call_camera(car: NvidiaRacecar):
+
+def call_camera(car: NvidiaRacecar): # When using threading make sure it is safe + possible to block everyone
+    # Start Camera and wait for frames
     profile = pipeline.start(config)
 
     frames = pipeline.wait_for_frames() # REVIEW: check this
     frame = frames[1]
+
+    # Fixup frames for later usage
     color_image = np.asanyarray(frame.get_data())
     color_image = color_image[...,::-1].copy()
-    
+
     depth_frame = frames[0].as_depth_frame()
-    print("Depth in middle of screen is ", depth_frame.get_distance(depth_frame.width // 2, depth_frame.height // 2))
+    depth_array = np.asanyarray(depth_frame.get_data())
+    print("Depth in middle of screen is ", depth_frame.get_distance(depth_frame.width // 2, 
+                                                                    depth_frame.height // 2))
 
     accepted, ids, rejected = detector.detectMarkers(color_image)
+    # print(ids)
+    # Verifys ids exist before calling
     if ids is not None and len(ids) > 0:
-        # TODO ignore repeat ArUco ids
-        # Range: ~12 m
-        print(ids)
+        car.throttle = 0.0 # Stop the car if we see ids in prep for dance
         try:
-            for id in ids:
-                if id[0] in KNOWN_MARKERS:
-                    print("Stop the main thread")
+            # Loop through each found ArUco id
+            for i, id_num in enumerate(ids):
+                coords = accepted[i][0]
+                # Ignore markers we aren't working with
+                if id_num[0] in KNOWN_MARKERS:
+                    print("Spotted #", id_num[0], "Id is:",
+                          depth_frame.get_distance(int((coords[0][0] + coords[2][0]) // 2),
+                                                   int((coords[0][1] + coords[2][1]) // 2)), "m away")
 
-                    print("Spotted # ", id)
-                    car.throttle = 0.0
-                    for _ in range(TWISTS_PER_ID[id[0]]): # twist n times
+                    # Do dance with tires
+                    for _ in range(TWISTS_PER_ID[id_num[0]]): # twist n times
                         car.steering = 0.5
                         time.sleep(WAIT_TIME)
                         car.steering = -0.5
                         time.sleep(WAIT_TIME / 2)
         except Exception as e:
-            print("Failed:", e)
-    elif depth_frame.get_distance(depth_frame.width // 2, depth_frame.height // 2) < 1.1: # if less than 1.1 meters to wall panic
-        print("Warning: Close to Wall")
+            print("Failed:", e) # don't break everything if something bad happens
+    else:
+        print("no ids found")
+    if (len(depth_array[depth_array > 0]) > 0
+          and np.amin(depth_array[depth_array > 0]) < 500): # if less than 0.5 meters to wall panic, ignore 0ed out values
+        print("Warning: Close to Wall", np.amin(depth_array[depth_array > 0]) / 1000, "m away")
 
     pipeline.stop()
-    print("stopped")
+    print("stopped camera")
 
 
 if __name__ == '__main__':
