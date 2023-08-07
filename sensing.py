@@ -49,23 +49,24 @@ def call_camera(car: NvidiaRacecar):
     frame = frames[1]
     color_image = np.asanyarray(frame.get_data())
     color_image = color_image[...,::-1].copy()
-    
+
     depth_frame = frames[0].as_depth_frame()
     print("Depth in middle of screen is ", depth_frame.get_distance(depth_frame.width // 2, depth_frame.height // 2))
 
     accepted, ids, rejected = detector.detectMarkers(color_image)
     if ids is not None and len(ids) > 0:
-        # TODO ignore repeat ArUco ids
         # Range: ~12 m
         print(ids)
         try:
-            for id in ids:
-                if id[0] in KNOWN_MARKERS:
-                    print("Stop the main thread")
+            for i in len(ids):
+                id_num = ids[i][0]
+                coords = accepted[i]
+                if id_num in KNOWN_MARKERS:
+                    print("Spotted # ", id_num)
+                    print("Id is:", depth_frame.get_distance((coords[0].x + coords[2].x) // 2, (coords[0].y + coords[2].y) // 2), "away")
 
-                    print("Spotted # ", id)
                     car.throttle = 0.0
-                    for _ in range(TWISTS_PER_ID[id[0]]): # twist n times
+                    for _ in range(TWISTS_PER_ID[id_num]): # twist n times
                         car.steering = 0.5
                         time.sleep(WAIT_TIME)
                         car.steering = -0.5
