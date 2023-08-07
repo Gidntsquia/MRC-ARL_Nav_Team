@@ -42,6 +42,7 @@ refine_param = cv2.aruco.RefineParameters()
 
 detector = cv2.aruco.ArucoDetector(aruco_dict, parameters, refine_param)
 
+
 def call_camera(car: NvidiaRacecar):
     profile = pipeline.start(config)
 
@@ -53,6 +54,7 @@ def call_camera(car: NvidiaRacecar):
     depth_frame = frames[0].as_depth_frame()
     print("Depth in middle of screen is ", depth_frame.get_distance(depth_frame.width // 2, depth_frame.height // 2))
 
+    print(np.amin(depth_frame.get_data()[depth_frame.get_data() > 0]))
     accepted, ids, rejected = detector.detectMarkers(color_image)
     if ids is not None and len(ids) > 0:
         # Range: ~12 m
@@ -73,7 +75,8 @@ def call_camera(car: NvidiaRacecar):
                         time.sleep(WAIT_TIME / 2)
         except Exception as e:
             print("Failed:", e)
-    elif depth_frame.get_distance(depth_frame.width // 2, depth_frame.height // 2) < 1.1: # if less than 1.1 meters to wall panic
+    elif (len(depth_frame.get_data()[depth_frame.get_data() > 0]) > 0
+          and np.amin(depth_frame.get_data()[depth_frame.get_data() > 0]) < 1.5): # if less than 1.1 meters to wall panic, ignore 0ed out values
         print("Warning: Close to Wall")
 
     pipeline.stop()
