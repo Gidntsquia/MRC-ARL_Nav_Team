@@ -23,7 +23,7 @@ is told to go forward a few times due to the internal motor controller.
 
 Team members: Addison Hanrattie, Jaxon Lee, Nicky Sremac-Saari, and Jordan White
 
-## Detailed Setup
+## Detailed Setup 🧑‍🔬
 Firstly, if we want to get the code onto the Jetson Nano and run it there, we need a way to connect to it. Here are two methods:
 
 
@@ -48,7 +48,6 @@ should show up on the screen.
 
         ssh jetson@IP_ADDRESS_HERE  (note: IP address on robot's screen)
         # Say yes to SSH'ing into the Jetson Nano
-        # You should now be connected to the Jetson Nano through SSH
 4. We are now connected to the Jetson Nano!
 
 ------
