@@ -29,6 +29,7 @@ To control the robot with the remote controller:
 5. The robot should be controllable with the following interface:
     Left joystick vertical axis     : throttle speed forward/back
     Left joystick horizontal axis   : steering left/right
+    "home"                          : connect controller to the robot
     "Y"                             : increase max speed
     "A"                             : decrease max speed
     "X"                             : take picture with camera and do dance if
