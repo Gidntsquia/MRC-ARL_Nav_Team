@@ -9,6 +9,7 @@ See more details about the program here:
 ## Quickstart :rocket:
 ```
 git clone https://github.com/Gidntsquia/MRC-ARL_Nav_Team
+python3 setup.py  # This installs required packages.
 python3 main.py
 ```
 
