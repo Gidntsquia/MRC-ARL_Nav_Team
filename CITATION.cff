@@ -1,0 +1,20 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: MRC-ARL-Nav-Team
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Addison
+    family-names: Hanrattie
+  - given-names: Jaxon
+    family-names: Lee
+repository-code: 'https://github.com/Gidntsquia/MRC-ARL_Nav_Team'
+abstract: Robot code for the MRC-ARL summer internship at UMD.
+keywords:
+  - robotics
+  - navigation
+license: GPL-3.0
